@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DadCodes • Father's Day & Dev Motivation Cards</title>
+    <!-- Unified Icon CDN -->
+    <script src="https://safwaticons.netlify.app/main.js"></script>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --secondary: #1e293b;
+            --accent: #38bdf8;
+            --accent-hover: #0ea5e9;
+            --text: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text);
+            overflow-x: hidden;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        header h1 span {
+            color: var(--accent);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        /* Responsive Grid for 10 Separate Cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 1200px;
+            padding: 10px;
+        }
+
+        .card-container {
+            position: relative;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+
+        /* Individual Card Box Container */
+        .card-area {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            background: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: inset 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Content hidden underneath the foil layer */
+        .card-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #1e293b;
+            background: #ffffff;
+        }
+
+        .card-content i {
+            font-size: 2.5rem;
+            color: #0284c7;
+            margin-bottom: 12px;
+        }
+
+        .quote-text {
+            font-size: 1rem;
+            font-style: italic;
+            font-weight: 600;
+            line-height: 1.5;
+            color: #0f172a;
+        }
+
+        .author-text {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            font-weight: 700;
+        }
+
+        /* Scratch Topcoat Layer Canvas */
+        canvas.scratch-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            touch-action: none;
+            z-index: 2;
+        }
+
+        /* Overlay Particle Canvas background */
+        #confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="confetti"></canvas>
+
+    <header>
+        <h1>Dad<span>Codes</span> <i class="fa-solid fa-cubes"></i></h1>
+        <p>Mass-ana Father's Day anbu matrum Dev Motivation Quotes! Ovoru card-ah separate-ah scratch panni parunga!</p>
+    </header>
+
+    <!-- Cards Grid Structure -->
+    <div class="cards-grid" id="cardsGrid"></div>
+
+    <script>
+        // Total 10 Tanglish Cards Pool
+        const cardDataPool = [
+            // --- Pure Father's Day Paasam ---
+            { text: "Nammalavu valandhalum, nammaku mela ulla ore uyir Appa dhaan.", author: "Anbu Magan/Magal", icon: "fa-solid fa-heart", title: "Card #1: Appa Paasam" },
+            { text: "Kadavul kudutha gift-leyey romba perusu... Enna poruthavara adhu en DAD dhaan!", author: "Anonymous", icon: "fa-solid fa-hands-holding", title: "Card #2: The Ultimate Gift" },
+            { text: "Intha ulagathuku avar oru dharisanama irukalam, aana enga family-ku avar dhaan muzhu ulagame!", author: "Family", icon: "fa-solid fa-earth-americas", title: "Card #3: Enga Ulagam" },
+            { text: "Naam kila vizhura munnadi thanga nenapoaru Appa, aana vizhundha pinbu thookividra deivam avar.", author: "Paasakaran", icon: "fa-solid fa-shield-halved", title: "Card #4: Real Protector" },
+            { text: "Kadaisi varai namakaaga mattumey uzhaithu, unmaiyana hero-va valbavar nam Appa mattum dhaan.", author: "Appa Magan/Magal", icon: "fa-solid fa-crown", title: "Card #5: Real Hero" },
+            { text: "Namma keta odaney vangi thara mudiyanalum, namma keka marandha vishayatha kooda paathu paathu seivar en Appa.", author: "Paasakaran", icon: "fa-solid fa-gift", title: "Card #6: Appa Special" },
+            
+            // --- Web Developer Motivation & Mix ---
+            { text: "Yella periya developer-um oru kaalathula terminal-ah close pannama thavicha beginner dhaan. Keep moving!", author: "Dev Devotion", icon: "fa-solid fa-terminal", title: "Card #7: Terminal Mass" },
+            { text: "Bugs varumbodhu bayapadatha, innoru console.log() matrum extra cup coffee irundha unnala fix panna mudiyum. You got this!", author: "Code Catalyst", icon: "fa-solid fa-mug-hot", title: "Card #8: Bug Vettai" },
+            { text: "Life-la yevalo errors vandhalum, 'Parvalada paathukalam' nu solli console panra ore database nam DAD mattum dhaan.", author: "Code Catalyst", icon: "fa-solid fa-database", title: "Card #9: Appa Console" },
+            { text: "Namma life app-la back-end-la silent-ah irundhu nammaku success thara romba kashta padra real architect... Appa!", author: "Stack Engineer", icon: "fa-solid fa-server", title: "Card #10: Backend Pillar" }
+        ];
+
+        const cardsGrid = document.getElementById('cardsGrid');
+        const confettiCanvas = document.getElementById('confetti');
+        const confettiCtx = confettiCanvas.getContext('2d');
+        let particles = [];
+        let globalConfettiActive = false;
+
+        // Build and append separate scratch cards into DOM dynamically
+        cardDataPool.forEach((data, index) => {
+            const cardContainer = document.createElement('div');
+            cardContainer.className = 'card-container';
+            
+            cardContainer.innerHTML = `
+                <div class="card-title">${data.title}</div>
+                <div class="card-area" id="area-${index}">
+                    <div class="card-content">
+                        <i class="${data.icon}"></i>
+                        <p class="quote-text">"${data.text}"</p>
+                        <p class="author-text">— ${data.author}</p>
+                    </div>
+                    <canvas class="scratch-canvas" id="canvas-${index}"></canvas>
+                </div>
+            `;
+            
+            cardsGrid.appendChild(cardContainer);
+            setupScratchMechanics(`canvas-${index}`, `area-${index}`);
+        });
+
+        // Setup individual canvas context for isolated scratch mechanics
+        function setupScratchMechanics(canvasId, areaId) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            const area = document.getElementById(areaId);
+            
+            let isDrawing = false;
+            let lastX = 0;
+            let lastY = 0;
+            let revealed = false;
+
+            function initFoil() {
+                const rect = area.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+
+                // Silver Brushed Metallic Texture Layer
+                const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                grad.addColorStop(0, '#cbd5e1');
+                grad.addColorStop(0.5, '#f1f5f9');
+                grad.addColorStop(1, '#94a3b8');
+
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Foreground Guide Text Pattern inside bounds
+                ctx.fillStyle = "rgba(15, 23, 42, 0.4)";
+                ctx.font = "bold 15px 'Segoe UI'";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText("✨ Scratch Pannunga ✨", canvas.width / 2, canvas.height / 2);
+            }
+
+            function scratch(e) {
+                if (!isDrawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const currentX = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+                const currentY = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.lineWidth = 35; 
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(currentX, currentY);
+                ctx.stroke();
+
+                lastX = currentX;
+                lastY = currentY;
+
+                checkPercentage();
+            }
+
+            function checkPercentage() {
+                if (revealed) return;
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const pixels = imageData.data;
+                let transparent = 0;
+
+                for (let i = 3; i < pixels.length; i += 4) {
+                    if (pixels[i] === 0) transparent++;
+                }
+
+                const percent = (transparent / (pixels.length / 4)) * 100;
+                if (percent > 40) {
+                    revealed = true;
+                    canvas.style.transition = 'opacity 0.4s ease';
+                    canvas.style.opacity = 0;
+                    setTimeout(() => {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    }, 400);
+                    triggerConfetti();
+                }
+            }
+
+            // Desktop Mouse Listeners
+            canvas.addEventListener('mousedown', (e) => {
+                isDrawing = true;
+                const rect = canvas.getBoundingClientRect();
+                lastX = (e.clientX || e.touches[0].clientX) - rect.left;
+                lastY = (e.clientY || e.touches[0].clientY) - rect.top;
+            });
+
+            canvas.addEventListener('mousemove', scratch);
+            window.addEventListener('mouseup', () => isDrawing = false);
+
+            // Mobile Touch Listeners
+            canvas.addEventListener('touchstart', (e) => {
+                isDrawing = true;
+                const rect = canvas.getBoundingClientRect();
+                lastX = e.touches[0].clientX - rect.left;
+                lastY = e.touches[0].clientY - rect.top;
+            }, { passive: true });
+
+            canvas.addEventListener('touchmove', scratch, { passive: true });
+            window.addEventListener('touchend', () => isDrawing = false);
+
+            setTimeout(initFoil, 200);
+            window.addEventListener('resize', initFoil);
+        }
+
+        // --- Shared Confetti Blast Particle Engine ---
+        function triggerConfetti() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+            
+            for (let i = 0; i < 40; i++) {
+                particles.push({
+                    x: Math.random() * window.innerWidth,
+                    y: Math.random() * window.innerHeight - (window.innerHeight / 2),
+                    r: Math.random() * 5 + 3,
+                    d: Math.random() * window.innerHeight,
+                    color: `rgba(${Math.floor(Math.random()*150 + 105)}, ${Math.floor(Math.random()*150 + 105)}, 255, 0.85)`,
+                    tilt: Math.random() * 10 - 5
+                });
+            }
+            if(!globalConfettiActive) {
+                globalConfettiActive = true;
+                animateConfetti();
+            }
+        }
+
+        function animateConfetti() {
+            confettiCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            let active = false;
+
+            particles.forEach((p, index) => {
+                p.y += Math.cos(p.d) + 2 + p.r / 2;
+                p.tilt += 0.05;
+                
+                if (p.y < window.innerHeight) {
+                    active = true;
+                    confettiCtx.beginPath();
+                    confettiCtx.lineWidth = p.r;
+                    confettiCtx.strokeStyle = p.color;
+                    confettiCtx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+                    confettiCtx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+                    confettiCtx.stroke();
+                } else {
+                    particles.splice(index, 1);
+                }
+            });
+
+            if (active || particles.length > 0) {
+                requestAnimationFrame(animateConfetti);
+            } else {
+                globalConfettiActive = false;
+                confettiCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            }
+        }
+    </script>
+</body>
+</html>
